@@ -12,20 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kunjungan_pasiens', function (Blueprint $table) {
-        $table->id();
-
-        $table->string('nama_pasien');
-
-        $table->enum('status', [
-            'Mahasiswa',
-            'Staf',
-            'Umum'
-        ]);
-        $table->date('tanggal_kunjungan');
-        $table->text('keluhan_utama');
-        $table->text('tindakan_obat');
-        $table->string('nama_dokter');
-        $table->timestamps();
+            $table->id();
+            $table->string('nama_pasien');
+            
+            // UBAH BAGIAN INI JADI STRING BISA:
+            $table->string('status'); 
+            
+            $table->date('tanggal_kunjungan');
+            $table->text('keluhan_utama');
+            $table->text('tindakan_obat');
+            $table->string('nama_dokter');
+            $table->timestamps();
         });
     }
 
