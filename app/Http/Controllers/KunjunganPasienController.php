@@ -77,27 +77,29 @@ class KunjunganPasienController extends Controller
         ->with('success', 'Data berhasil ditambahkan');
     }
 
-    public function edit($id)
+   public function edit($id)
     {
-        $data = KunjunganPasien::findOrFail($id);
+        // Ubah dari $data menjadi $item
+        $item = KunjunganPasien::findOrFail($id);
 
-        return view('kunjungan.edit', compact('data'));
+        // Kirimkan sebagai 'item' ke view
+        return view('kunjungan.edit', compact('item'));
     }
 
     public function update(Request $request, $id)
     {
-        $data = KunjunganPasien::findOrFail($id);
+        $item = KunjunganPasien::findOrFail($id);
 
         $request->validate([
             'nama_pasien' => 'required',
-            'status' => 'required|in:Mahasiswa,Staf,Umum',
+            'status' => 'required|in:Mahasiswa,Dosen,Staf,Umum',
             'tanggal_kunjungan' => 'required|date',
             'keluhan_utama' => 'required',
             'tindakan_obat' => 'required',
             'nama_dokter' => 'required',
         ]);
 
-        $data->update($request->only([
+        $item->update($request->only([
             'nama_pasien',
             'status',
             'tanggal_kunjungan',
