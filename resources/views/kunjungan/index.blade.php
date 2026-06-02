@@ -51,7 +51,7 @@
                 </svg>
             </div>
             <div>
-                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Staf / Dosen</span>
+                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Staf</span>
                 <span class="text-xl font-bold text-slate-800">{{ $totalStaf ?? '-' }}</span>
             </div>
         </div>
@@ -110,7 +110,7 @@
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
                                         Mahasiswa
                                     </span>
-                                @elseif(Str::lower($item->status) == 'dosen' || Str::lower($item->status) == 'staf')
+                                @elseif(Str::lower($item->status) == 'staf')
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
                                         {{ $item->status }}
                                     </span>

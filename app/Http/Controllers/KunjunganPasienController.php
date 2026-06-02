@@ -92,7 +92,7 @@ class KunjunganPasienController extends Controller
 
         $request->validate([
             'nama_pasien' => 'required',
-            'status' => 'required|in:Mahasiswa,Dosen,Staf,Umum',
+            'status' => 'required|in:Mahasiswa,Staf,Umum',
             'tanggal_kunjungan' => 'required|date',
             'keluhan_utama' => 'required',
             'tindakan_obat' => 'required',

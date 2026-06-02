@@ -61,7 +61,6 @@
                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200 appearance-none cursor-pointer" required>
                             <option value="" disabled {{ old('status') ? '' : 'selected' }}>Pilih Status</option>
                             <option value="Mahasiswa" {{ old('status') == 'Mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
-                            <option value="Dosen" {{ old('status') == 'Dosen' ? 'selected' : '' }}>Dosen</option>
                             <option value="Staf" {{ old('status') == 'Staf' ? 'selected' : '' }}>Staf</option>
                             <option value="Umum" {{ old('status') == 'Umum' ? 'selected' : '' }}>Umum</option>
                         </select>
