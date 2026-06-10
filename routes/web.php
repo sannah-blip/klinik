@@ -1,13 +1,74 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\KunjunganPasienController;
-
-Route::resource(
-    'kunjungan',
-    KunjunganPasienController::class
-);
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect('/kunjungan');
+    return view('welcome');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| Profile
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Kunjungan Pasien - Bisa Dilihat Semua Orang
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/kunjunganpasien', [KunjunganPasienController::class, 'index'])
+    ->middleware('auth')
+    ->name('kunjunganpasien.index');
+
+/*
+|--------------------------------------------------------------------------
+| Kunjungan Pasien - Khusus Admin
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'admin'])->group(function () {
+
+    Route::get('/kunjunganpasien/create', [KunjunganPasienController::class, 'create'])
+        ->name('kunjunganpasien.create');
+
+    Route::post('/kunjunganpasien', [KunjunganPasienController::class, 'store'])
+        ->name('kunjunganpasien.store');
+
+    Route::get('/kunjunganpasien/{kunjunganpasien}/edit', [KunjunganPasienController::class, 'edit'])
+        ->name('kunjunganpasien.edit');
+
+    Route::put('/kunjunganpasien/{kunjunganpasien}', [KunjunganPasienController::class, 'update'])
+        ->name('kunjunganpasien.update');
+
+    Route::delete('/kunjunganpasien/{kunjunganpasien}', [KunjunganPasienController::class, 'destroy'])
+        ->name('kunjunganpasien.destroy');
+
+});
+
+require __DIR__.'/auth.php';

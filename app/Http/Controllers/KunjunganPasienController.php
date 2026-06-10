@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\KunjunganPasien;
+use App\Models\KategoriKunjungan;
+use App\Models\Dokter;
+use Illuminate\Support\Facades\Storage;
 
 class KunjunganPasienController extends Controller
 {
@@ -11,7 +14,8 @@ class KunjunganPasienController extends Controller
     {
         $search = $request->search;
 
-        $data = KunjunganPasien::where(
+        $data = KunjunganPasien::with('kategoriKunjungan', 'dokter')
+        ->where(    
             'nama_pasien',
             'like',
             "%$search%"
@@ -50,7 +54,9 @@ class KunjunganPasienController extends Controller
 
     public function create()
     {
-        return view('kunjungan.create');
+        $kategori = \App\Models\KategoriKunjungan::all();
+        $dokters = \App\Models\Dokter::all();
+        return view('kunjungan.create', compact('kategori', 'dokters'));
     }
 
     public function store(Request $request)
@@ -59,31 +65,41 @@ class KunjunganPasienController extends Controller
             'nama_pasien' => 'required',
             'status' => 'required|in:Mahasiswa,Staf,Umum',
             'tanggal_kunjungan' => 'required|date',
+            'kategori_kunjungan_id' => 'required',
             'keluhan_utama' => 'required',
             'tindakan_obat' => 'required',
-            'nama_dokter' => 'required',
+            'dokter_id' => 'required',
+            'dokumen' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        KunjunganPasien::create($request->only([
-            'nama_pasien',
-            'status',
-            'tanggal_kunjungan',
-            'keluhan_utama',
-            'tindakan_obat',
-            'nama_dokter',
-        ]));
+    $dokumenPath = null;
 
-        return redirect('/kunjungan')
-        ->with('success', 'Data berhasil ditambahkan');
+    if ($request->hasFile('dokumen')) {
+        $dokumenPath = $request->file('dokumen')
+            ->store('dokumen_pasien', 'public');
     }
 
+    KunjunganPasien::create([
+        'nama_pasien' => $request->nama_pasien,
+        'status' => $request->status,
+        'tanggal_kunjungan' => $request->tanggal_kunjungan,
+        'kategori_kunjungan_id' => $request->kategori_kunjungan_id,
+        'keluhan_utama' => $request->keluhan_utama,
+        'tindakan_obat' => $request->tindakan_obat,
+        'dokter_id' => $request->dokter_id,
+        'dokumen' => $dokumenPath,
+    ]);
+
+    return redirect('/kunjunganpasien')
+        ->with('success', 'Data berhasil ditambahkan');
+    }
    public function edit($id)
     {
         // Ubah dari $data menjadi $item
         $item = KunjunganPasien::findOrFail($id);
-
+        $dokters = Dokter::all();
         // Kirimkan sebagai 'item' ke view
-        return view('kunjungan.edit', compact('item'));
+        return view('kunjungan.edit', compact('item', 'dokters'));
     }
 
     public function update(Request $request, $id)
@@ -96,19 +112,31 @@ class KunjunganPasienController extends Controller
             'tanggal_kunjungan' => 'required|date',
             'keluhan_utama' => 'required',
             'tindakan_obat' => 'required',
-            'nama_dokter' => 'required',
+            'dokter_id' => 'required',
+            'dokumen' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        $item->update($request->only([
-            'nama_pasien',
-            'status',
-            'tanggal_kunjungan',
-            'keluhan_utama',
-            'tindakan_obat',
-            'nama_dokter',
-        ]));
+        $dokumenPath = $item->dokumen;
 
-        return redirect('/kunjungan')
+        if ($request->hasFile('dokumen')) {
+            if ($item->dokumen && Storage::disk('public')->exists($item->dokumen)) {
+                Storage::disk('public')->delete($item->dokumen);
+            }
+
+            $dokumenPath = $request->file('dokumen')
+                ->store('dokumen_pasien', 'public');
+        }
+
+        $item->update([
+            'nama_pasien' => $request->nama_pasien,
+            'status' => $request->status,
+            'tanggal_kunjungan' => $request->tanggal_kunjungan,
+            'keluhan_utama' => $request->keluhan_utama,
+            'tindakan_obat' => $request->tindakan_obat,
+            'dokter_id' => $request->dokter_id,
+            'dokumen' => $dokumenPath,
+        ]);
+        return redirect('/kunjunganpasien')
             ->with('success', 'Data berhasil diupdate');
     }
 
@@ -116,9 +144,13 @@ class KunjunganPasienController extends Controller
     {
         $data = KunjunganPasien::findOrFail($id);
 
+        if ($data->dokumen && Storage::disk('public')->exists($data->dokumen)) {
+            Storage::disk('public')->delete($data->dokumen);
+        }
+
         $data->delete();
 
-        return redirect('/kunjungan')
-        ->with('success', 'Data berhasil dihapus');
+        return redirect('/kunjunganpasien')
+            ->with('success', 'Data berhasil dihapus');
     }
 }

@@ -8,7 +8,7 @@
             <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Edit Kunjungan Pasien</h1>
             <p class="text-sm text-slate-500 mt-1">Ubah formulir di bawah untuk memperbarui data kunjungan.</p>
         </div>
-        <a href="{{ route('kunjungan.index') }}" 
+        <a href="{{ route('kunjunganpasien.index') }}" 
            class="inline-flex items-center justify-center p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors duration-150"
            title="Kembali ke Daftar Kunjungan">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
@@ -36,7 +36,7 @@
     @endif
 
     <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-100 shadow-sm">
-        <form action="{{ route('kunjungan.update', $item->id) }}" method="POST" class="space-y-5">
+        <form action="{{ route('kunjunganpasien.update', $item->id) }}" method="POST" class="space-y-5">
             @csrf
             @method('PUT')
 
@@ -92,15 +92,17 @@
                           placeholder="Tuliskan tindakan..." required>{{ old('tindakan_obat', $item->tindakan_obat) }}</textarea>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dokter Pemeriksa</label>
-                <input type="text"
-                       name="nama_dokter"
-                       value="{{ old('nama_dokter', $item->nama_dokter) }}"
-                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200"
-                       placeholder="Contoh: dr. Setiawan" required>
-            </div>
+            <select name="dokter_id"
+                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
 
+                @foreach($dokters as $dokter)
+                    <option value="{{ $dokter->id }}"
+                        {{ $item->dokter_id == $dokter->id ? 'selected' : '' }}>
+                        {{ $dokter->nama_dokter }}
+                    </option>
+                @endforeach
+
+            </select>
             <div class="pt-2 flex justify-end">
                 <button type="submit"
                         class="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-sm shadow-emerald-200 transition-all duration-200">

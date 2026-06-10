@@ -9,7 +9,7 @@
             <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Tambah Kunjungan Pasien</h1>
             <p class="text-sm text-slate-500 mt-1">Isi formulir di bawah untuk mencatat data kunjungan baru.</p>
         </div>
-        <a href="{{ route('kunjungan.index') }}" 
+        <a href="{{ route('kunjunganpasien.index') }}" 
            class="inline-flex items-center justify-center p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors duration-150"
            title="Kembali ke Daftar Kunjungan">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
@@ -39,7 +39,10 @@
 
     <!-- FORM CARD -->
     <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-100 shadow-sm">
-        <form action="{{ route('kunjungan.store') }}" method="POST" class="space-y-5">
+        <form action="{{ route('kunjunganpasien.store') }}" 
+              method="POST" 
+              enctype="multipart/form-data"
+              class="space-y-5">
             @csrf
 
             <!-- Nama Pasien -->
@@ -82,6 +85,27 @@
                 </div>
             </div>
 
+            <!-- Kategori Kunjungan -->
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    Kategori Kunjungan
+                </label>
+
+                <select
+                    name="kategori_kunjungan_id"
+                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200"
+                    required
+                >
+                    <option value="">Pilih Kategori</option>
+
+                    @foreach($kategori as $item)
+                        <option value="{{ $item->id }}">
+                            {{ $item->nama_kategori }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <!-- Keluhan Utama -->
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Keluhan Utama</label>
@@ -100,15 +124,38 @@
                           placeholder="Tuliskan tindakan medis dan resep obat yang diberikan..." required>{{ old('tindakan_obat') }}</textarea>
             </div>
 
-            <!-- Nama Dokter -->
-            <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dokter Pemeriksa</label>
-                <input type="text"
-                       name="nama_dokter"
-                       value="{{ old('nama_dokter') }}"
-                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200"
-                       placeholder="Contoh: dr. Setiawan" required>
-            </div>
+            <!-- Dokter Pemeriksa -->
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                Dokter Pemeriksa
+            </label>
+
+            <select
+                name="dokter_id"
+                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200"
+                required
+            >
+                <option value="">Pilih Dokter</option>
+
+                @foreach($dokters as $dokter)
+                    <option value="{{ $dokter->id }}">
+                        {{ $dokter->nama_dokter }} - {{ $dokter->spesialisasi }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- Upload Dokumen -->
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                Dokumen Resep / Surat Sakit
+            </label>
+
+            <input type="file"
+                name="dokumen"
+                accept=".pdf,.jpg,.jpeg,.png"
+                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+        </div>
 
             <!-- ACTION BUTTON -->
             <div class="pt-2 flex justify-end">
