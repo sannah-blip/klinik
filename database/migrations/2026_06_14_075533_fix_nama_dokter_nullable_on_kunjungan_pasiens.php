@@ -8,15 +8,14 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Kolom nama_dokter sudah tidak dipakai (digantikan relasi dokter_id),
+     * tapi masih NOT NULL sehingga menyebabkan error saat insert.
+     * Migration ini menjadikannya nullable agar tidak mengganggu insert baru.
      */
     public function up(): void
     {
         Schema::table('kunjungan_pasiens', function (Blueprint $table) {
-            $table->foreignId('kategori_kunjungan_id')
-                ->nullable()
-                ->after('status')
-                ->constrained('kategori_kunjungans')
-                ->onDelete('cascade');
+            $table->string('nama_dokter')->nullable()->default(null)->change();
         });
     }
 
@@ -26,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('kunjungan_pasiens', function (Blueprint $table) {
-            $table->dropColumn('kategori_kunjungan_id');
+            $table->string('nama_dokter')->nullable(false)->change();
         });
     }
 };

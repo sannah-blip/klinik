@@ -82,6 +82,25 @@
             </div>
 
             <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kategori Kunjungan</label>
+                <div class="relative">
+                    <select name="kategori_kunjungan_id"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200 appearance-none cursor-pointer" required>
+                        @foreach($kategori as $kat)
+                            <option value="{{ $kat->id }}" {{ old('kategori_kunjungan_id', $item->kategori_kunjungan_id) == $kat->id ? 'selected' : '' }}>
+                                {{ $kat->nama_kategori }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Keluhan Utama</label>
                 <textarea name="keluhan_utama"
                           rows="3"

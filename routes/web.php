@@ -14,9 +14,9 @@ Route::get('/', function () {
 | Dashboard (Diproteksi Auth)
 |--------------------------------------------------------------------------
 */
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [KunjunganPasienController::class, 'dashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 /*
 |--------------------------------------------------------------------------
 | Profile (Diproteksi Auth)

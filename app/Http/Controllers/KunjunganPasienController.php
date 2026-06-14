@@ -7,9 +7,38 @@ use App\Models\KunjunganPasien;
 use App\Models\KategoriKunjungan;
 use App\Models\Dokter;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class KunjunganPasienController extends Controller
 {
+    public function dashboard()
+    {
+        $totalPasien = KunjunganPasien::count();
+        $antreanHariIni = KunjunganPasien::whereDate('tanggal_kunjungan', today())->count();
+        $selesaiHariIni = KunjunganPasien::whereDate('tanggal_kunjungan', today())->count();
+
+        // Data kluster berdasarkan kategori untuk pie chart
+        $klusterKategori = KunjunganPasien::select(
+            'kategori_kunjungan_id',
+            DB::raw('count(*) as total')
+        )
+        ->with('kategoriKunjungan')
+        ->groupBy('kategori_kunjungan_id')
+        ->get()
+        ->map(function ($item) {
+            return [
+                'nama' => $item->kategoriKunjungan ? $item->kategoriKunjungan->nama_kategori : 'Tidak Diketahui',
+                'total' => $item->total,
+            ];
+        });
+
+        return view('dashboard', compact(
+            'totalPasien',
+            'antreanHariIni',
+            'klusterKategori'
+        ));
+    }
+
     public function index(Request $request)
     {
         $search = $request->search;
@@ -98,8 +127,9 @@ class KunjunganPasienController extends Controller
         // Ubah dari $data menjadi $item
         $item = KunjunganPasien::findOrFail($id);
         $dokters = Dokter::all();
+        $kategori = KategoriKunjungan::all();
         // Kirimkan sebagai 'item' ke view
-        return view('kunjungan.edit', compact('item', 'dokters'));
+        return view('kunjungan.edit', compact('item', 'dokters', 'kategori'));
     }
 
     public function update(Request $request, $id)
@@ -110,6 +140,7 @@ class KunjunganPasienController extends Controller
             'nama_pasien' => 'required',
             'status' => 'required|in:Mahasiswa,Staf,Umum',
             'tanggal_kunjungan' => 'required|date',
+            'kategori_kunjungan_id' => 'required',
             'keluhan_utama' => 'required',
             'tindakan_obat' => 'required',
             'dokter_id' => 'required',
@@ -131,6 +162,7 @@ class KunjunganPasienController extends Controller
             'nama_pasien' => $request->nama_pasien,
             'status' => $request->status,
             'tanggal_kunjungan' => $request->tanggal_kunjungan,
+            'kategori_kunjungan_id' => $request->kategori_kunjungan_id,
             'keluhan_utama' => $request->keluhan_utama,
             'tindakan_obat' => $request->tindakan_obat,
             'dokter_id' => $request->dokter_id,

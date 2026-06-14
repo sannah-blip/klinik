@@ -221,6 +221,10 @@
 
             </form>
 
+            <div style="margin-top: 24px; text-align: center; font-size: 14px; color: #64748b;">
+                Belum punya akun? <a href="{{ route('register') }}" class="text-link">Daftar Akun</a>
+            </div>
+
         </div>
 
     </div>

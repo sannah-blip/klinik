@@ -37,6 +37,7 @@
                         <th class="px-6 py-4 text-center w-16">No</th>
                         <th class="px-6 py-4">Nama Pasien</th>
                         <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4">Kategori</th>
                         <th class="px-6 py-4">Dokter Bertugas</th>
                         <th class="px-6 py-4">Spesialisasi</th>
                         <th class="px-6 py-4">Dokumen</th>
@@ -72,6 +73,12 @@
                                     {{ $item->status }}
                                 </span>
                             @endif
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-indigo-50 rounded-lg font-medium">
+                                {{ $item->kategoriKunjungan->nama_kategori ?? '-' }}
+                            </span>
                         </td>
 
                         <td class="px-6 py-4 font-medium">
@@ -121,7 +128,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="{{ $isAdmin ? 7 : 6 }}"
+                        <td colspan="{{ $isAdmin ? 8 : 7 }}"
                             class="px-6 py-16 text-center text-slate-400 bg-slate-50/30">
                             <div class="flex flex-col items-center justify-center">
                                 <span class="text-2xl mb-2">📂</span>
