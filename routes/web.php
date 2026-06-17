@@ -30,24 +30,31 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Kunjungan Pasien - Bisa Dilihat Semua Orang (Diproteksi Auth)
+| Kunjungan Pasien - Khusus User (Mendaftar Kunjungan)
 |--------------------------------------------------------------------------
 */
-Route::get('/kunjunganpasien', [KunjunganPasienController::class, 'index'])
-    ->middleware('auth')
-    ->name('kunjunganpasien.index');
+Route::middleware('auth')->group(function () {
+    Route::get('/kunjunganpasien/create', [KunjunganPasienController::class, 'create'])->name('kunjunganpasien.create');
+    Route::post('/kunjunganpasien', [KunjunganPasienController::class, 'store'])->name('kunjunganpasien.store');
+});
 
 /*
 |--------------------------------------------------------------------------
-| Kunjungan Pasien - Khusus Admin
+| Kunjungan Pasien & Administrasi - Khusus Admin
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/kunjunganpasien/create', [KunjunganPasienController::class, 'create'])->name('kunjunganpasien.create');
-    Route::post('/kunjunganpasien', [KunjunganPasienController::class, 'store'])->name('kunjunganpasien.store');
+    Route::get('/kunjunganpasien', [KunjunganPasienController::class, 'index'])->name('kunjunganpasien.index');
     Route::get('/kunjunganpasien/{kunjunganpasien}/edit', [KunjunganPasienController::class, 'edit'])->name('kunjunganpasien.edit');
     Route::put('/kunjunganpasien/{kunjunganpasien}', [KunjunganPasienController::class, 'update'])->name('kunjunganpasien.update');
     Route::delete('/kunjunganpasien/{kunjunganpasien}', [KunjunganPasienController::class, 'destroy'])->name('kunjunganpasien.destroy');
+
+    // CRUD Dokter Spesialis
+    Route::resource('dokter', \App\Http\Controllers\DokterController::class);
+
+    // Edit Informasi Klinik
+    Route::get('/clinic-info/edit', [\App\Http\Controllers\ClinicInfoController::class, 'edit'])->name('clinic-info.edit');
+    Route::put('/clinic-info', [\App\Http\Controllers\ClinicInfoController::class, 'update'])->name('clinic-info.update');
 });
 
 require __DIR__.'/auth.php';

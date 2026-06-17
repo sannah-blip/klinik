@@ -43,10 +43,22 @@
                         <span>📊</span> Dashboard
                     </a>
 
+                    @if(auth()->user()->role === 'Admin')
                     <a href="{{ route('kunjunganpasien.index') }}" 
-                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 {{ request()->routeIs('kunjunganpasien.*') ? 'bg-emerald-50 text-emerald-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}">
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 {{ request()->routeIs('kunjunganpasien.index') || request()->routeIs('kunjunganpasien.edit') ? 'bg-emerald-50 text-emerald-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}">
                         <span>📋</span> Data Kunjungan
                     </a>
+
+                    <a href="{{ route('dokter.index') }}" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 {{ request()->routeIs('dokter.*') ? 'bg-emerald-50 text-emerald-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <span>🩺</span> Kelola Dokter
+                    </a>
+
+                    <a href="{{ route('clinic-info.edit') }}" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 {{ request()->routeIs('clinic-info.*') ? 'bg-emerald-50 text-emerald-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <span>🏢</span> Informasi Klinik
+                    </a>
+                    @endif
 
                     <a href="{{ route('profile.edit') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 {{ request()->routeIs('profile.*') ? 'bg-emerald-50 text-emerald-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}">
@@ -99,5 +111,6 @@
 
     </div>
 
+    @stack('scripts')
 </body>
 </html>

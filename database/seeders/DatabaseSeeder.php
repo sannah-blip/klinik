@@ -57,6 +57,14 @@ class DatabaseSeeder extends Seeder
             'dokter_id' => fn() => \App\Models\Dokter::inRandomOrder()->first()->id,
             'kategori_kunjungan_id' => fn() => \App\Models\KategoriKunjungan::inRandomOrder()->first()->id,
         ]);
+
+        // Seed Clinic Info
+        \App\Models\ClinicInfo::create([
+            'nama_klinik' => 'Klinik Kampus',
+            'jam_operasional' => '08:00 - 16:00',
+            'kontak_darurat' => 'Ext-119',
+            'deskripsi' => 'Sistem Informasi Klinik Kampus siap digunakan. Pantau antrean, kelola riwayat pemeriksaan, dan berikan pelayanan kesehatan terbaik hari ini.'
+        ]);
     }
 }
 
