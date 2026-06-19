@@ -69,8 +69,8 @@
                             </span>
                         </td>
 
-                        <td class="px-6 py-4 text-slate-500">
-                            {{ $item->jadwal_jaga }}
+                        <td class="px-6 py-4 text-slate-500 font-medium">
+                            {{ $item->jadwal_formatted }}
                         </td>
 
                         <td class="px-6 py-4 text-center">

@@ -23,7 +23,8 @@ class DokterController extends Controller
         $request->validate([
             'nama_dokter' => 'required|string|max:255',
             'spesialisasi' => 'required|string|max:255',
-            'jadwal_jaga' => 'required|string|max:255',
+            'jadwal_mulai' => 'required|date',
+            'jadwal_selesai' => 'required|date|after_or_equal:jadwal_mulai',
         ]);
 
         Dokter::create($request->all());
@@ -41,7 +42,8 @@ class DokterController extends Controller
         $request->validate([
             'nama_dokter' => 'required|string|max:255',
             'spesialisasi' => 'required|string|max:255',
-            'jadwal_jaga' => 'required|string|max:255',
+            'jadwal_mulai' => 'required|date',
+            'jadwal_selesai' => 'required|date|after_or_equal:jadwal_mulai',
         ]);
 
         $dokter->update($request->all());

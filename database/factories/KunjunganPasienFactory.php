@@ -28,7 +28,8 @@ public function definition(): array
         ]),
         'tanggal_kunjungan' => fake()->date(),
         'keluhan_utama' => fake()->sentence(),
-        'tindakan_obat' => fake()->sentence(),
+        'tindakan' => fake()->sentence(),
+        'pemberian_obat' => fake()->sentence(),
         'nama_dokter' => fake()->name(),
     ];
 }

@@ -179,6 +179,19 @@
                                 Buka Kelola Dokter →
                             </span>
                         </a>
+
+                        <a href="{{ route('kunjunganpasien.create') }}" class="p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-emerald-500/30 hover:bg-emerald-50/20 transition group flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">🚨</span>
+                                    <h4 class="text-sm font-bold text-slate-800 group-hover:text-emerald-700 transition">Kunjungan Darurat</h4>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Input data kunjungan pasien darurat secara langsung oleh Admin.</p>
+                            </div>
+                            <span class="text-xs font-semibold text-emerald-600 mt-4 inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                Tambah Kunjungan Baru →
+                            </span>
+                        </a>
                     </div>
                 </div>
 
@@ -288,9 +301,13 @@
                                 <div class="relative">
                                     <select name="dokter_id"
                                             class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200 appearance-none cursor-pointer" required>
+                                        <option value="" disabled selected>Pilih Dokter</option>
                                         @foreach($dokters as $dokter)
-                                            <option value="{{ $dokter->id }}" {{ old('dokter_id') == $dokter->id ? 'selected' : '' }}>
-                                                {{ $dokter->nama_dokter }} (Poli {{ $dokter->spesialisasi }})
+                                            <option value="{{ $dokter->id }}" 
+                                                    data-start="{{ $dokter->jadwal_mulai }}" 
+                                                    data-end="{{ $dokter->jadwal_selesai }}"
+                                                    {{ old('dokter_id') == $dokter->id ? 'selected' : '' }}>
+                                                {{ $dokter->nama_dokter }} (Poli {{ $dokter->spesialisasi }}) — {{ $dokter->jadwal_formatted }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -369,14 +386,17 @@
                                         {{ $visit->keluhan_utama }}
                                     </td>
                                     <td class="px-4 py-3.5">
-                                        @if($visit->tindakan_obat === 'Menunggu Pemeriksaan')
-                                            <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-amber-700 bg-amber-50 rounded-lg">
-                                                Menunggu Pemeriksaan
-                                            </span>
-                                        @else
-                                            <div class="font-bold text-emerald-700">Tercatat</div>
-                                            <div class="text-xs text-slate-500 max-w-[150px] truncate" title="{{ $visit->tindakan_obat }}">{{ $visit->tindakan_obat }}</div>
-                                        @endif
+                                         @if($visit->tindakan === 'Menunggu Pemeriksaan' || !$visit->tindakan)
+                                             <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-amber-700 bg-amber-50 rounded-lg">
+                                                 Menunggu Pemeriksaan
+                                             </span>
+                                         @else
+                                             <div class="font-bold text-emerald-700">Pemeriksaan Selesai</div>
+                                             <div class="text-[11px] text-slate-700 mt-1 font-semibold">Tindakan: <span class="font-normal text-slate-500">{{ $visit->tindakan }}</span></div>
+                                             @if($visit->pemberian_obat)
+                                             <div class="text-[11px] text-slate-700 font-semibold">Obat: <span class="font-normal text-slate-500">{{ $visit->pemberian_obat }}</span></div>
+                                             @endif
+                                         @endif
                                     </td>
                                 </tr>
                                 @empty
@@ -428,7 +448,7 @@
                                 </span>
                             </div>
                             <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-                                📅 {{ $dokter->jadwal_jaga }}
+                                📅 {{ $dokter->jadwal_formatted }}
                             </p>
                         </div>
                         @empty
@@ -529,6 +549,62 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }]
     });
+});
+</script>
+@endif
+
+@if(auth()->user()->role !== 'Admin')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dateInput = document.querySelector('input[name="tanggal_kunjungan"]');
+    const dokterSelect = document.querySelector('select[name="dokter_id"]');
+    
+    if (dateInput && dokterSelect) {
+        function filterDokters() {
+            const selectedDateVal = dateInput.value;
+            if (!selectedDateVal) return;
+            
+            const selectedDate = new Date(selectedDateVal);
+            selectedDate.setHours(0,0,0,0);
+            
+            let hasValidSelected = false;
+            
+            Array.from(dokterSelect.options).forEach(option => {
+                if (option.value === "") return;
+                
+                const startVal = option.getAttribute('data-start');
+                const endVal = option.getAttribute('data-end');
+                
+                if (startVal && endVal) {
+                    const startDate = new Date(startVal);
+                    startDate.setHours(0,0,0,0);
+                    const endDate = new Date(endVal);
+                    endDate.setHours(23,59,59,999);
+                    
+                    if (selectedDate >= startDate && selectedDate <= endDate) {
+                        option.disabled = false;
+                        option.style.display = 'block';
+                        if (option.value === dokterSelect.value) {
+                            hasValidSelected = true;
+                        }
+                    } else {
+                        option.disabled = true;
+                        option.style.display = 'none';
+                        if (option.selected) {
+                            option.selected = false;
+                        }
+                    }
+                }
+            });
+            
+            if (!hasValidSelected) {
+                dokterSelect.value = "";
+            }
+        }
+        
+        dateInput.addEventListener('change', filterDokters);
+        filterDokters();
+    }
 });
 </script>
 @endif

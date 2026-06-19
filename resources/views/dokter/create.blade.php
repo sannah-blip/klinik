@@ -61,13 +61,21 @@
                        placeholder="Contoh: Penyakit Dalam" required>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Jadwal Jaga</label>
-                <input type="text"
-                       name="jadwal_jaga"
-                       value="{{ old('jadwal_jaga') }}"
-                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200"
-                       placeholder="Contoh: Senin - Rabu (09:00 - 13:00)" required>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Jadwal Mulai Jaga</label>
+                    <input type="datetime-local"
+                           name="jadwal_mulai"
+                           value="{{ old('jadwal_mulai') }}"
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Jadwal Selesai Jaga</label>
+                    <input type="datetime-local"
+                           name="jadwal_selesai"
+                           value="{{ old('jadwal_selesai') }}"
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200" required>
+                </div>
             </div>
 
             <div class="pt-4 flex justify-end">

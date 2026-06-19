@@ -108,12 +108,21 @@
                           placeholder="Tuliskan keluhan..." required>{{ old('keluhan_utama', $item->keluhan_utama) }}</textarea>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tindakan / Pemberian Obat</label>
-                <textarea name="tindakan_obat"
-                          rows="3"
-                          class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200 resize-none"
-                          placeholder="Tuliskan tindakan..." required>{{ old('tindakan_obat', $item->tindakan_obat) }}</textarea>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tindakan Medis</label>
+                    <textarea name="tindakan"
+                              rows="3"
+                              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200 resize-none"
+                              placeholder="Tuliskan tindakan..." required>{{ old('tindakan', $item->tindakan) }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pemberian Obat / Resep</label>
+                    <textarea name="pemberian_obat"
+                              rows="3"
+                              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200 resize-none"
+                              placeholder="Tuliskan resep obat...">{{ old('pemberian_obat', $item->pemberian_obat) }}</textarea>
+                </div>
             </div>
 
             <div>
@@ -122,8 +131,11 @@
                     <select name="dokter_id"
                             class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-sm rounded-xl text-slate-700 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50 transition-all duration-200 appearance-none cursor-pointer" required>
                         @foreach($dokters as $dokter)
-                            <option value="{{ $dokter->id }}" {{ old('dokter_id', $item->dokter_id) == $dokter->id ? 'selected' : '' }}>
-                                {{ $dokter->nama_dokter }} — Poli {{ $dokter->spesialisasi }}
+                            <option value="{{ $dokter->id }}" 
+                                    data-start="{{ $dokter->jadwal_mulai }}" 
+                                    data-end="{{ $dokter->jadwal_selesai }}"
+                                    {{ old('dokter_id', $item->dokter_id) == $dokter->id ? 'selected' : '' }}>
+                                {{ $dokter->nama_dokter }} — Poli {{ $dokter->spesialisasi }} ({{ $dokter->jadwal_formatted }})
                             </option>
                         @endforeach
                     </select>
@@ -166,4 +178,60 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dateInput = document.querySelector('input[name="tanggal_kunjungan"]');
+    const dokterSelect = document.querySelector('select[name="dokter_id"]');
+    
+    if (dateInput && dokterSelect) {
+        function filterDokters() {
+            const selectedDateVal = dateInput.value;
+            if (!selectedDateVal) return;
+            
+            const selectedDate = new Date(selectedDateVal);
+            selectedDate.setHours(0,0,0,0);
+            
+            let hasValidSelected = false;
+            
+            Array.from(dokterSelect.options).forEach(option => {
+                if (option.value === "") return;
+                
+                const startVal = option.getAttribute('data-start');
+                const endVal = option.getAttribute('data-end');
+                
+                if (startVal && endVal) {
+                    const startDate = new Date(startVal);
+                    startDate.setHours(0,0,0,0);
+                    const endDate = new Date(endVal);
+                    endDate.setHours(23,59,59,999);
+                    
+                    if (selectedDate >= startDate && selectedDate <= endDate) {
+                        option.disabled = false;
+                        option.style.display = 'block';
+                        if (option.value === dokterSelect.value) {
+                            hasValidSelected = true;
+                        }
+                    } else {
+                        option.disabled = true;
+                        option.style.display = 'none';
+                        if (option.selected) {
+                            option.selected = false;
+                        }
+                    }
+                }
+            });
+            
+            if (!hasValidSelected) {
+                dokterSelect.value = "";
+            }
+        }
+        
+        dateInput.addEventListener('change', filterDokters);
+        filterDokters();
+    }
+});
+</script>
+@endpush
 @endsection

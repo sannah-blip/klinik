@@ -16,38 +16,13 @@
 
     .login-card {
         width: 100%;
-        max-width: 850px;
+        max-width: 480px;
         background: #ffffff;
         border-radius: 24px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        display: grid;
-        grid-template-columns: 12fr;
-        overflow: hidden;
-        min-height: 550px;
-    }
-
-    /* Layout Responsif: Monitor Lebar */
-    @media (min-width: 768px) {
-        .login-card {
-            grid-template-columns: 5fr 7fr;
-        }
-    }
-
-    .panel-left {
-        background: linear-gradient(135deg, #10b981, #047857);
-        color: #ffffff;
-        padding: 40px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        position: relative;
-    }
-
-    /* Sembunyikan panel kiri di hp */
-    @media (max-width: 767px) {
-        .panel-left {
-            display: none;
-        }
+        overflow: hidden;
     }
 
     .panel-right {
@@ -56,6 +31,16 @@
         flex-direction: column;
         justify-content: center;
         background: #ffffff;
+    }
+
+    .panel-left {
+        background: linear-gradient(135deg, #10b981, #047857);
+        color: #ffffff;
+        padding: 35px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
     }
 
     .form-group {
@@ -141,27 +126,6 @@
     
     <div class="login-card">
         
-        <div class="panel-left">
-            <div>
-                <h3 style="margin: 0; font-size: 24px; font-weight: 700;">Klinik Kampus</h3>
-                <p style="margin: 4px 0 0 0; font-size: 12px; color: #a7f3d0;">Health Services</p>
-            </div>
-
-            <div style="margin: 40px 0;">
-                <h1 style="font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 12px;">
-                    Daftar Akun <br><span style="color: #6ee7b7;">Mudah & Cepat.</span>
-                </h1>
-                <p style="font-size: 14px; color: #ecfdf5; line-height: 1.5; margin: 0;">
-                    Buat akun baru untuk mengakses layanan rekam medis dan data kunjungan Klinik Kampus.
-                </p>
-            </div>
-
-            <div style="font-size: 13px; color: #d1fae5; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                <div style="margin-bottom: 8px;">• Akses Riwayat Kunjungan</div>
-                <div>• Terintegrasi dengan Sistem Klinik</div>
-            </div>
-        </div>
-
         <div class="panel-right">
             
             <div style="margin-bottom: 20px;">
@@ -253,6 +217,30 @@
 
             </form>
 
+        </div>
+
+        <div class="panel-left">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 700;">Klinik Kampus</h3>
+                    <p style="margin: 2px 0 0 0; font-size: 11px; color: #a7f3d0;">Health Services</p>
+                </div>
+                <div style="font-size: 24px;">🩺</div>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <h1 style="font-size: 22px; font-weight: 800; line-height: 1.2; margin-bottom: 8px;">
+                    Daftar Akun <span style="color: #6ee7b7;">Mudah & Cepat.</span>
+                </h1>
+                <p style="font-size: 13px; color: #ecfdf5; line-height: 1.5; margin: 0;">
+                    Buat akun baru untuk mengakses layanan rekam medis dan data kunjungan Klinik Kampus.
+                </p>
+            </div>
+
+            <div style="font-size: 12px; color: #d1fae5; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 15px; display: flex; flex-direction: row; justify-content: space-between; gap: 10px;">
+                <div>• Akses Riwayat Kunjungan</div>
+                <div>• Terintegrasi dengan Sistem Klinik</div>
+            </div>
         </div>
 
     </div>

@@ -120,10 +120,6 @@ class KunjunganPasienController extends Controller
 
     public function create()
     {
-        if (Auth::user()->role === 'Admin') {
-            abort(403, 'Admin tidak dapat menambah kunjungan langsung.');
-        }
-
         $kategori = \App\Models\KategoriKunjungan::all();
         $dokters = \App\Models\Dokter::all();
         return view('kunjungan.create', compact('kategori', 'dokters'));
@@ -131,11 +127,7 @@ class KunjunganPasienController extends Controller
 
     public function store(Request $request)
     {
-        if (Auth::user()->role === 'Admin') {
-            abort(403, 'Admin tidak dapat menambah kunjungan langsung.');
-        }
-
-        $request->validate([
+        $rules = [
             'nama_pasien' => 'required',
             'status' => 'required|in:Mahasiswa,Staf,Umum',
             'tanggal_kunjungan' => 'required|date',
@@ -143,7 +135,32 @@ class KunjunganPasienController extends Controller
             'keluhan_utama' => 'required',
             'dokter_id' => 'required',
             'dokumen' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
-        ]);
+        ];
+
+        if (Auth::user()->role === 'Admin') {
+            $rules['tindakan'] = 'nullable';
+            $rules['pemberian_obat'] = 'nullable';
+        }
+
+        $request->validate($rules);
+
+        // Validation of doctor's shift
+        $dokter = Dokter::findOrFail($request->dokter_id);
+        if ($dokter->jadwal_mulai && $dokter->jadwal_selesai) {
+            $visitDate = \Carbon\Carbon::parse($request->tanggal_kunjungan);
+            $startDate = \Carbon\Carbon::parse($dokter->jadwal_mulai)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($dokter->jadwal_selesai)->endOfDay();
+            
+            if (!$visitDate->between($startDate, $endDate)) {
+                return back()->withErrors([
+                    'dokter_id' => 'Dokter ' . $dokter->nama_dokter . ' tidak bertugas pada tanggal tersebut. Jadwal jaga: ' . $dokter->jadwal_formatted
+                ])->withInput();
+            }
+        } else {
+            return back()->withErrors([
+                'dokter_id' => 'Dokter ' . $dokter->nama_dokter . ' belum memiliki jadwal jaga.'
+            ])->withInput();
+        }
 
         $dokumenPath = null;
 
@@ -152,14 +169,17 @@ class KunjunganPasienController extends Controller
                 ->store('dokumen_pasien', 'public');
         }
 
+        $isAdmin = Auth::user()->role === 'Admin';
+
         $kunjungan = KunjunganPasien::create([
-            'user_id' => Auth::id(),
+            'user_id' => $isAdmin ? null : Auth::id(),
             'nama_pasien' => $request->nama_pasien,
             'status' => $request->status,
             'tanggal_kunjungan' => $request->tanggal_kunjungan,
             'kategori_kunjungan_id' => $request->kategori_kunjungan_id,
             'keluhan_utama' => $request->keluhan_utama,
-            'tindakan_obat' => 'Menunggu Pemeriksaan',
+            'tindakan' => $isAdmin ? ($request->tindakan ?? 'Menunggu Pemeriksaan') : 'Menunggu Pemeriksaan',
+            'pemberian_obat' => $isAdmin ? $request->pemberian_obat : null,
             'dokter_id' => $request->dokter_id,
             'dokumen' => $dokumenPath,
         ]);
@@ -169,16 +189,16 @@ class KunjunganPasienController extends Controller
             ->where('id', '<=', $kunjungan->id)
             ->count();
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Pendaftaran kunjungan Anda berhasil dikirim. Nomor Antrean Anda: #' . $noAntrean);
+        $redirect = $isAdmin ? redirect()->route('kunjunganpasien.index') : redirect()->route('dashboard');
+
+        return $redirect->with('success', 'Pendaftaran kunjungan berhasil disimpan. Nomor Antrean Anda: #' . $noAntrean);
     }
-   public function edit($id)
+
+    public function edit($id)
     {
-        // Ubah dari $data menjadi $item
         $item = KunjunganPasien::findOrFail($id);
         $dokters = Dokter::all();
         $kategori = KategoriKunjungan::all();
-        // Kirimkan sebagai 'item' ke view
         return view('kunjungan.edit', compact('item', 'dokters', 'kategori'));
     }
 
@@ -192,10 +212,29 @@ class KunjunganPasienController extends Controller
             'tanggal_kunjungan' => 'required|date',
             'kategori_kunjungan_id' => 'required',
             'keluhan_utama' => 'required',
-            'tindakan_obat' => 'required',
+            'tindakan' => 'required',
+            'pemberian_obat' => 'nullable',
             'dokter_id' => 'required',
             'dokumen' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
+
+        // Validation of doctor's shift
+        $dokter = Dokter::findOrFail($request->dokter_id);
+        if ($dokter->jadwal_mulai && $dokter->jadwal_selesai) {
+            $visitDate = \Carbon\Carbon::parse($request->tanggal_kunjungan);
+            $startDate = \Carbon\Carbon::parse($dokter->jadwal_mulai)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($dokter->jadwal_selesai)->endOfDay();
+            
+            if (!$visitDate->between($startDate, $endDate)) {
+                return back()->withErrors([
+                    'dokter_id' => 'Dokter ' . $dokter->nama_dokter . ' tidak bertugas pada tanggal tersebut. Jadwal jaga: ' . $dokter->jadwal_formatted
+                ])->withInput();
+            }
+        } else {
+            return back()->withErrors([
+                'dokter_id' => 'Dokter ' . $dokter->nama_dokter . ' belum memiliki jadwal jaga.'
+            ])->withInput();
+        }
 
         $dokumenPath = $item->dokumen;
 
@@ -214,7 +253,8 @@ class KunjunganPasienController extends Controller
             'tanggal_kunjungan' => $request->tanggal_kunjungan,
             'kategori_kunjungan_id' => $request->kategori_kunjungan_id,
             'keluhan_utama' => $request->keluhan_utama,
-            'tindakan_obat' => $request->tindakan_obat,
+            'tindakan' => $request->tindakan,
+            'pemberian_obat' => $request->pemberian_obat,
             'dokter_id' => $request->dokter_id,
             'dokumen' => $dokumenPath,
         ]);

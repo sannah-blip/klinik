@@ -17,6 +17,14 @@
                 Kelola manajemen data riwayat kunjungan pasien klinik kampus.
             </p>
         </div>
+        @if($isAdmin)
+        <div>
+            <a href="{{ route('kunjunganpasien.create') }}"
+               class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] rounded-xl shadow-lg shadow-emerald-600/10 transition-all duration-200">
+                + Tambah Kunjungan
+            </a>
+        </div>
+        @endif
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
