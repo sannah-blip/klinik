@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Dokter;
+use App\Models\User;
 
 class KunjunganPasien extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'nama_pasien',
         'status',
         'tanggal_kunjungan',
@@ -20,6 +22,11 @@ class KunjunganPasien extends Model
         'kategori_kunjungan_id',
         'dokumen',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function kategoriKunjungan()
     {

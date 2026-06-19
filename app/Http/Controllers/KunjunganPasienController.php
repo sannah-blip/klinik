@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\KunjunganPasien;
 use App\Models\KategoriKunjungan;
 use App\Models\Dokter;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +21,7 @@ class KunjunganPasienController extends Controller
             'deskripsi' => 'Sistem Informasi Klinik Kampus siap digunakan.'
         ]);
 
-        if (auth()->user()->role === 'Admin') {
+        if (Auth::user()->role === 'Admin') {
             $totalPasien = KunjunganPasien::count();
             $antreanHariIni = KunjunganPasien::whereDate('tanggal_kunjungan', today())->count();
 
@@ -49,13 +50,13 @@ class KunjunganPasienController extends Controller
             $kategori = \App\Models\KategoriKunjungan::all();
             $dokters = \App\Models\Dokter::all();
 
-            $myVisits = KunjunganPasien::where('nama_pasien', auth()->user()->name)
+            $myVisits = KunjunganPasien::where('user_id', Auth::id())
                 ->with('dokter', 'kategoriKunjungan')
                 ->latest()
                 ->take(5)
                 ->get()
                 ->map(function ($visit) {
-                    $visit->no_antrean = KunjunganPasien::where('tanggal_kunjungan', $visit->tanggal_kunjungan)
+                    $visit->no_antrean = KunjunganPasien::whereDate('tanggal_kunjungan', $visit->tanggal_kunjungan)
                         ->where('dokter_id', $visit->dokter_id)
                         ->where('id', '<=', $visit->id)
                         ->count();
@@ -73,7 +74,7 @@ class KunjunganPasienController extends Controller
 
     public function index(Request $request)
     {
-        if (auth()->user()->role !== 'Admin') {
+        if (Auth::user()->role !== 'Admin') {
             abort(403, 'Akses ditolak.');
         }
 
@@ -119,7 +120,7 @@ class KunjunganPasienController extends Controller
 
     public function create()
     {
-        if (auth()->user()->role === 'Admin') {
+        if (Auth::user()->role === 'Admin') {
             abort(403, 'Admin tidak dapat menambah kunjungan langsung.');
         }
 
@@ -130,7 +131,7 @@ class KunjunganPasienController extends Controller
 
     public function store(Request $request)
     {
-        if (auth()->user()->role === 'Admin') {
+        if (Auth::user()->role === 'Admin') {
             abort(403, 'Admin tidak dapat menambah kunjungan langsung.');
         }
 
@@ -152,6 +153,7 @@ class KunjunganPasienController extends Controller
         }
 
         $kunjungan = KunjunganPasien::create([
+            'user_id' => Auth::id(),
             'nama_pasien' => $request->nama_pasien,
             'status' => $request->status,
             'tanggal_kunjungan' => $request->tanggal_kunjungan,
@@ -162,7 +164,7 @@ class KunjunganPasienController extends Controller
             'dokumen' => $dokumenPath,
         ]);
 
-        $noAntrean = KunjunganPasien::where('tanggal_kunjungan', $kunjungan->tanggal_kunjungan)
+        $noAntrean = KunjunganPasien::whereDate('tanggal_kunjungan', $kunjungan->tanggal_kunjungan)
             ->where('dokter_id', $kunjungan->dokter_id)
             ->where('id', '<=', $kunjungan->id)
             ->count();
