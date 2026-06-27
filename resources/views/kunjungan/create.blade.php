@@ -182,6 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (dateInput && dokterSelect) {
         function filterDokters() {
             const selectedDateVal = dateInput.value;
+            // JIKA input tanggal kosong, biarkan semua pilihan dokter tetap terlihat
             if (!selectedDateVal) return;
             
             const selectedDate = new Date(selectedDateVal);
@@ -222,10 +223,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         
+        // Listener dipasang agar filter HANYA berjalan ketika ada perubahan tanggal dari user
         dateInput.addEventListener('change', filterDokters);
-        filterDokters();
+        
+        // PENTING: Jangan mengeksekusi filterDokters() secara langsung saat inisialisasi awal 
+        // agar browser tidak menyembunyikan data pilihan dokter akibat kegagalan parsing tanggal.
     }
 });
 </script>
 @endpush
-@endsection
